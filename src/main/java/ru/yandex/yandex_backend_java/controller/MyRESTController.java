@@ -11,6 +11,7 @@ import ru.yandex.yandex_backend_java.helpers.TimestampUtils;
 import ru.yandex.yandex_backend_java.helpers.Validators;
 import ru.yandex.yandex_backend_java.service.ShopUnitService;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,13 +27,13 @@ public class MyRESTController {
 
     @PostMapping("/imports")
     @ResponseStatus(HttpStatus.OK)
-    public void importShopUnits(@RequestBody ShopUnitImportRequest request) {
+    public void importShopUnits(@RequestBody ShopUnitImportRequest request) throws ParseException {
         if (!TimestampUtils.matchesISO8601(request.getUpdateDate())) {
             throw new RuntimeException("Validation Failed");
         }
 
         for (ShopUnit unit : request.getItems()) {
-            unit.setDate(request.getUpdateDate());
+            unit.setDate(TimestampUtils.stringToDate(request.getUpdateDate()));
 
             updateAllParents(unit, request.getUpdateDate());
 
@@ -40,7 +41,7 @@ public class MyRESTController {
         }
     }
 
-    private void updateAllParents(ShopUnit shopUnit, String date) {
+    private void updateAllParents(ShopUnit shopUnit, String date) throws ParseException {
         if (shopUnit.getParentId() == null) return;
 
         ShopUnit unit = shopUnitService.getShopUnit(shopUnit.getParentId());
@@ -49,7 +50,7 @@ public class MyRESTController {
             return;
         }
 
-        unit.setDate(date);
+        unit.setDate(TimestampUtils.stringToDate(date));
 
         shopUnitService.saveShopUnit(unit);
 

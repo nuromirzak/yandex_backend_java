@@ -1,12 +1,15 @@
 package ru.yandex.yandex_backend_java.enity;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "items")
+@Table(name = "items2")
 public class ShopUnit {
     @Id
     @Column(name = "id")
@@ -16,7 +19,8 @@ public class ShopUnit {
     private String name;
 
     @Column(name = "date")
-    private String date;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    private Date date;
 
     @Column(name = "parentId")
     private String parentId;
@@ -28,7 +32,7 @@ public class ShopUnit {
     @Column(name = "price")
     private Integer price;
 
-//    @JsonInclude(JsonInclude.Include.NON_NULL)
+    //    @JsonInclude(JsonInclude.Include.NON_NULL)
     @Transient
     private List<ShopUnit> children;
 
@@ -51,11 +55,11 @@ public class ShopUnit {
         this.name = name;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
@@ -93,14 +97,6 @@ public class ShopUnit {
 
     @Override
     public String toString() {
-        return "ShopUnit{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", date='" + date + '\'' +
-                ", parentId='" + parentId + '\'' +
-                ", type=" + type +
-                ", price=" + price +
-                ", children=" + children +
-                '}';
+        return "ShopUnit{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", date='" + date + '\'' + ", parentId='" + parentId + '\'' + ", type=" + type + ", price=" + price + ", children=" + children + '}';
     }
 }

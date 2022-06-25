@@ -10,12 +10,21 @@ import java.util.TimeZone;
 public class TimestampUtils {
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
+    static {
+//        dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+//        dateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Almaty"));
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+
     private TimestampUtils() {
     }
 
-    public static String getISO8601StringForDate(Date date) {
-        dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+    public static String dateToString(Date date) {
         return dateFormat.format(date);
+    }
+
+    public static Date stringToDate(String s) throws ParseException {
+        return dateFormat.parse(s);
     }
 
     public static boolean matchesISO8601(String date) {
