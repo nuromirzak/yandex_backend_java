@@ -2,8 +2,11 @@ package ru.yandex.yandex_backend_java.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.yandex_backend_java.dao.ShopUnitHistoryRepository;
 import ru.yandex.yandex_backend_java.dao.ShopUnitRepository;
 import ru.yandex.yandex_backend_java.enity.ShopUnit;
+import ru.yandex.yandex_backend_java.enity.ShopUnitHistory;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,10 +14,12 @@ import java.util.Optional;
 @Service
 public class ShopUnitsServiceImpl implements ShopUnitService {
     private final ShopUnitRepository repository;
+    private final ShopUnitHistoryRepository repository2;
 
-    @Autowired
-    public ShopUnitsServiceImpl(ShopUnitRepository repository) {
+    public ShopUnitsServiceImpl(@Autowired ShopUnitRepository repository,
+                                @Autowired ShopUnitHistoryRepository repository2) {
         this.repository = repository;
+        this.repository2 = repository2;
     }
 
     @Override
@@ -33,6 +38,13 @@ public class ShopUnitsServiceImpl implements ShopUnitService {
     }
 
     @Override
+    public void saveShopUnitClone(ShopUnit shopUnit) {
+        ShopUnitHistory clone = new ShopUnitHistory(shopUnit);
+
+        repository2.save(clone);
+    }
+
+    @Override
     public ShopUnit getShopUnit(String id) {
         ShopUnit shopUnit = null;
 
@@ -46,8 +58,14 @@ public class ShopUnitsServiceImpl implements ShopUnitService {
     }
 
     @Override
+    @Transactional
     public void deleteShopUnit(String id) {
-        if (repository.existsById(id))
-            repository.deleteById(id);
+        repository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public void deleteShopUnitHistory(String id) {
+        repository2.deleteAllByIdIs(id);
     }
 }

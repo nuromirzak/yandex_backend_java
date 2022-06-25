@@ -12,7 +12,11 @@ public interface ShopUnitService {
 
     public void saveShopUnit(ShopUnit shopUnit);
 
+    public void saveShopUnitClone(ShopUnit shopUnit);
+
     public ShopUnit getShopUnit(String id);
 
     public void deleteShopUnit(String id);
+
+    public void deleteShopUnitHistory(String id);
 }

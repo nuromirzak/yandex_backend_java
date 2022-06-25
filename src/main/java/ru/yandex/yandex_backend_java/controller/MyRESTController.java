@@ -38,6 +38,7 @@ public class MyRESTController {
             updateAllParents(unit, request.getUpdateDate());
 
             shopUnitService.saveShopUnit(unit);
+            shopUnitService.saveShopUnitClone(unit);
         }
     }
 
@@ -53,6 +54,7 @@ public class MyRESTController {
         unit.setDate(TimestampUtils.stringToDate(date));
 
         shopUnitService.saveShopUnit(unit);
+        shopUnitService.saveShopUnitClone(unit);
 
         updateAllParents(unit, date);
     }
@@ -70,19 +72,18 @@ public class MyRESTController {
             throw new NoSuchShopUnitException("Item not found");
         }
 
-        deleteAllChildren(shopUnit);
-
-        shopUnitService.deleteShopUnit(id);
+        deleteAllChildren(shopUnit.getId());
     }
 
-    private void deleteAllChildren(ShopUnit shopUnit) {
-        List<ShopUnit> children = shopUnitService.getChildren(shopUnit.getId());
+    private void deleteAllChildren(String id) {
+        List<ShopUnit> children = shopUnitService.getChildren(id);
 
         for (ShopUnit child : children) {
-            deleteAllChildren(child);
+            deleteAllChildren(child.getId());
         }
 
-        shopUnitService.deleteShopUnit(shopUnit.getId());
+        shopUnitService.deleteShopUnitHistory(id);
+        shopUnitService.deleteShopUnit(id);
     }
 
     @GetMapping("/nodes/{id}")
@@ -126,5 +127,10 @@ public class MyRESTController {
         }
 
         return result;
+    }
+
+    @GetMapping("/sales")
+    public List<ShopUnit> getHistory(@RequestParam String date) {
+        return null;
     }
 }
