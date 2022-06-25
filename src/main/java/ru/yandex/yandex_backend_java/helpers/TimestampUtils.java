@@ -8,7 +8,9 @@ import java.util.TimeZone;
 
 // https://gist.github.com/kristopherjohnson/6124652
 public class TimestampUtils {
-    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    public static final String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+
+    private static final DateFormat dateFormat = new SimpleDateFormat(pattern);
 
     static {
 //        dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));

@@ -3,10 +3,10 @@ package ru.yandex.yandex_backend_java.enity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import ru.yandex.yandex_backend_java.helpers.TimestampUtils;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -25,7 +25,7 @@ public class ShopUnitHistory {
     private String name;
 
     @Column(name = "date")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    @JsonFormat(pattern = TimestampUtils.pattern)
     private Date date;
 
     @Column(name = "parentId")
