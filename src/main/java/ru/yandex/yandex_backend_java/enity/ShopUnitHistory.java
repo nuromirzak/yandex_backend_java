@@ -2,6 +2,7 @@ package ru.yandex.yandex_backend_java.enity;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -14,6 +15,7 @@ public class ShopUnitHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "revNum")
+    @JsonIgnore
     private int revNum;
 
     @Column(name = "id")
@@ -36,10 +38,6 @@ public class ShopUnitHistory {
     @Column(name = "price")
     private Integer price;
 
-    //    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @Transient
-    private List<ShopUnit> children;
-
     public ShopUnitHistory() {
     }
 
@@ -50,7 +48,6 @@ public class ShopUnitHistory {
         this.parentId = shopUnit.getParentId();
         this.type = shopUnit.getType();
         this.price = shopUnit.getPrice();
-        this.children = shopUnit.getChildren();
     }
 
     public int getRevNum() {
@@ -109,16 +106,15 @@ public class ShopUnitHistory {
         this.price = price;
     }
 
-    public List<ShopUnit> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<ShopUnit> children) {
-        this.children = children;
-    }
-
     @Override
     public String toString() {
-        return "ShopUnit{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", date='" + date + '\'' + ", parentId='" + parentId + '\'' + ", type=" + type + ", price=" + price + ", children=" + children + '}';
+        return "ShopUnitHistory{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", date=" + date +
+                ", parentId='" + parentId + '\'' +
+                ", type=" + type +
+                ", price=" + price +
+                '}';
     }
 }

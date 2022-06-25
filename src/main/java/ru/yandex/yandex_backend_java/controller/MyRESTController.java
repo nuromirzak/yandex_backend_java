@@ -13,10 +13,7 @@ import ru.yandex.yandex_backend_java.helpers.Validators;
 import ru.yandex.yandex_backend_java.service.ShopUnitService;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/")
@@ -134,13 +131,44 @@ public class MyRESTController {
 
     @GetMapping("/sales")
     public List<ShopUnitHistory> getHistory(@RequestParam String date) throws ParseException {
-        Date parsedDate = TimestampUtils.stringToDate(date);
+        if (!TimestampUtils.matchesISO8601(date)) {
+            throw new RuntimeException("Validation Failed");
+        }
 
+        Date parsedDate = TimestampUtils.stringToDate(date);
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(parsedDate);
         cal.add(Calendar.DATE, -1);
         Date dateBefore1Days = cal.getTime();
         return shopUnitService.getRecordsBetween(dateBefore1Days, parsedDate);
+    }
+
+    @GetMapping("/node/{id}/statistic")
+    public Map<String, List<ShopUnitHistory>> getStatistic(@PathVariable String id, @RequestParam String dateStart, @RequestParam String dateEnd) throws ParseException {
+        if (!TimestampUtils.matchesISO8601(dateStart)
+                || !TimestampUtils.matchesISO8601(dateEnd)
+                || !Validators.isValidUUID(id)) {
+            throw new RuntimeException("Validation Failed");
+        }
+
+        ShopUnit shopUnit = shopUnitService.getShopUnit(id);
+
+        if (shopUnit == null) {
+            throw new NoSuchShopUnitException("Item not found");
+        }
+
+        Date parsedDate1 = TimestampUtils.stringToDate(dateStart);
+        Date parsedDate2 = TimestampUtils.stringToDate(dateEnd);
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(parsedDate2);
+        cal.add(Calendar.SECOND, -1);
+        Date newDate = cal.getTime();
+
+        List<ShopUnitHistory> items = shopUnitService.getRecordsBetween(parsedDate1, newDate)
+                .stream().filter(o -> o.getId().equals(id)).toList();
+
+        return Map.of("items", items);
     }
 }
