@@ -24,11 +24,6 @@ public class ShopUnitsServiceImpl implements ShopUnitService {
     }
 
     @Override
-    public List<ShopUnit> getAllShopUnits() {
-        return repository.findAll();
-    }
-
-    @Override
     public List<ShopUnit> getChildren(String id) {
         return repository.findAllByParentId(id);
     }

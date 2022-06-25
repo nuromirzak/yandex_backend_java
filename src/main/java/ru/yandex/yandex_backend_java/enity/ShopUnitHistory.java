@@ -38,6 +38,14 @@ public class ShopUnitHistory {
     @Column(name = "price")
     private Integer price;
 
+    @Column(name = "sum")
+    @JsonIgnore
+    private int sum;
+
+    @Column(name = "quantity")
+    @JsonIgnore
+    private int quantity;
+
     public ShopUnitHistory() {
     }
 
@@ -106,6 +114,22 @@ public class ShopUnitHistory {
         this.price = price;
     }
 
+    public int getSum() {
+        return sum;
+    }
+
+    public void setSum(int sum) {
+        this.sum = sum;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
     @Override
     public String toString() {
         return "ShopUnitHistory{" +
@@ -115,6 +139,8 @@ public class ShopUnitHistory {
                 ", parentId='" + parentId + '\'' +
                 ", type=" + type +
                 ", price=" + price +
+                ", sum=" + sum +
+                ", quantity=" + quantity +
                 '}';
     }
 }

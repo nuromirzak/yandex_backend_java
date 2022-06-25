@@ -8,8 +8,6 @@ import java.util.Date;
 import java.util.List;
 
 public interface ShopUnitService {
-    public List<ShopUnit> getAllShopUnits();
-
     public List<ShopUnit> getChildren(String id);
 
     public void saveShopUnit(ShopUnit shopUnit);

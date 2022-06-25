@@ -16,7 +16,6 @@ import java.text.ParseException;
 import java.util.*;
 
 @RestController
-@RequestMapping("/")
 public class MyRESTController {
     private final ShopUnitService shopUnitService;
 
@@ -35,33 +34,29 @@ public class MyRESTController {
         for (ShopUnit unit : request.getItems()) {
             unit.setDate(TimestampUtils.stringToDate(request.getUpdateDate()));
 
-            updateAllParents(unit, request.getUpdateDate());
+            updateParents(unit, request.getUpdateDate(), -1);
+
+            int[] sumAndQuantity = getChildrenPrice(unit);
+
+            unit.setSum(sumAndQuantity[0]);
+            unit.setQuantity(sumAndQuantity[1]);
+
+            if (unit.getQuantity() > 0) {
+                int price = unit.getSum() / unit.getQuantity();
+
+                unit.setPrice(price);
+            }
+
+            updateParents(unit, request.getUpdateDate(), 1);
 
             shopUnitService.saveShopUnit(unit);
             shopUnitService.saveShopUnitClone(unit);
         }
     }
 
-    private void updateAllParents(ShopUnit shopUnit, String date) throws ParseException {
-        if (shopUnit.getParentId() == null) return;
-
-        ShopUnit unit = shopUnitService.getShopUnit(shopUnit.getParentId());
-
-        if (unit == null) {
-            return;
-        }
-
-        unit.setDate(TimestampUtils.stringToDate(date));
-
-        shopUnitService.saveShopUnit(unit);
-        shopUnitService.saveShopUnitClone(unit);
-
-        updateAllParents(unit, date);
-    }
-
     @DeleteMapping("/delete/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteShopUnit(@PathVariable String id) {
+    public void deleteShopUnit(@PathVariable String id) throws ParseException {
         if (!Validators.isValidUUID(id)) {
             throw new RuntimeException("Validation Failed");
         }
@@ -72,18 +67,8 @@ public class MyRESTController {
             throw new NoSuchShopUnitException("Item not found");
         }
 
+        updateParents(shopUnit, null, -1);
         deleteAllChildren(shopUnit.getId());
-    }
-
-    private void deleteAllChildren(String id) {
-        List<ShopUnit> children = shopUnitService.getChildren(id);
-
-        for (ShopUnit child : children) {
-            deleteAllChildren(child.getId());
-        }
-
-        shopUnitService.deleteShopUnitHistory(id);
-        shopUnitService.deleteShopUnit(id);
     }
 
     @GetMapping("/nodes/{id}")
@@ -103,34 +88,8 @@ public class MyRESTController {
         return shopUnit;
     }
 
-    private int[] flatten(ShopUnit shopUnit) {
-        int[] result = new int[2];
-
-        if (shopUnit.getType() == ShopUnitType.OFFER) {
-            result[0] += shopUnit.getPrice();
-            result[1] += 1;
-        } else {
-            shopUnit.setChildren(new ArrayList<>());
-
-            for (ShopUnit su : shopUnitService.getChildren(shopUnit.getId())) {
-                int[] result2 = flatten(su);
-                result[0] += result2[0];
-                result[1] += result2[1];
-                shopUnit.getChildren().add(su);
-            }
-        }
-
-        if (result[0] == 0) {
-            shopUnit.setPrice(0);
-        } else {
-            shopUnit.setPrice(result[0] / result[1]);
-        }
-
-        return result;
-    }
-
     @GetMapping("/sales")
-    public List<ShopUnitHistory> getHistory(@RequestParam String date) throws ParseException {
+    public Map<String, List<ShopUnitHistory>> getHistory(@RequestParam String date) throws ParseException {
         if (!TimestampUtils.matchesISO8601(date)) {
             throw new RuntimeException("Validation Failed");
         }
@@ -141,7 +100,10 @@ public class MyRESTController {
         cal.setTime(parsedDate);
         cal.add(Calendar.DATE, -1);
         Date dateBefore1Days = cal.getTime();
-        return shopUnitService.getRecordsBetween(dateBefore1Days, parsedDate);
+
+        List<ShopUnitHistory> list = shopUnitService.getRecordsBetween(dateBefore1Days, parsedDate);
+
+        return Map.of("list", list);
     }
 
     @GetMapping("/node/{id}/statistic")
@@ -170,5 +132,72 @@ public class MyRESTController {
                 .stream().filter(o -> o.getId().equals(id)).toList();
 
         return Map.of("items", items);
+    }
+
+    private int[] getChildrenPrice(ShopUnit shopUnit) {
+        if (shopUnit.getType() == ShopUnitType.OFFER) {
+            return new int[]{shopUnit.getPrice(), 1};
+        }
+
+        int[] price = new int[2];
+
+        for (ShopUnit unit : shopUnitService.getChildren(shopUnit.getId())) {
+            price[0] += unit.getSum();
+            price[1] += unit.getQuantity();
+        }
+
+        return price;
+
+    }
+
+    private void updateParents(ShopUnit shopUnit, String date, int operation) throws ParseException {
+        if (shopUnit.getParentId() == null) return;
+
+        ShopUnit parent = shopUnitService.getShopUnit(shopUnit.getParentId());
+
+        if (parent == null) {
+            return;
+        }
+
+        if (operation == 1)
+            parent.setDate(TimestampUtils.stringToDate(date));
+
+        parent.setSum(parent.getSum() + shopUnit.getSum() * operation);
+        parent.setQuantity(parent.getQuantity() + shopUnit.getQuantity() * operation);
+
+        if (parent.getQuantity() > 0) {
+            int price = parent.getSum() / parent.getQuantity();
+
+            parent.setPrice(price);
+        }
+
+        shopUnitService.saveShopUnit(parent);
+        shopUnitService.saveShopUnitClone(parent);
+
+        updateParents(parent, date, operation);
+    }
+
+    private void deleteAllChildren(String id) {
+        List<ShopUnit> children = shopUnitService.getChildren(id);
+
+        for (ShopUnit child : children) {
+            deleteAllChildren(child.getId());
+        }
+
+        shopUnitService.deleteShopUnitHistory(id);
+        shopUnitService.deleteShopUnit(id);
+    }
+
+    private void flatten(ShopUnit shopUnit) {
+        if (shopUnit.getType() == ShopUnitType.OFFER) {
+            return;
+        }
+
+        shopUnit.setChildren(new ArrayList<>());
+
+        for (ShopUnit su : shopUnitService.getChildren(shopUnit.getId())) {
+            flatten(su);
+            shopUnit.getChildren().add(su);
+        }
     }
 }

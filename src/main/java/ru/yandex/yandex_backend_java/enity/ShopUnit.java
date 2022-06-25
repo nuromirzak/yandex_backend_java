@@ -2,6 +2,7 @@ package ru.yandex.yandex_backend_java.enity;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "items2")
+@Table(name = "items")
 public class ShopUnit {
     @Id
     @Column(name = "id")
@@ -32,7 +33,15 @@ public class ShopUnit {
     @Column(name = "price")
     private Integer price;
 
-    //    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Column(name = "sum")
+    @JsonIgnore
+    private int sum;
+
+    @Column(name = "quantity")
+    @JsonIgnore
+    private int quantity;
+
+//    @JsonInclude(JsonInclude.Include.NON_NULL)
     @Transient
     private List<ShopUnit> children;
 
@@ -87,6 +96,22 @@ public class ShopUnit {
         this.price = price;
     }
 
+    public int getSum() {
+        return sum;
+    }
+
+    public void setSum(int sum) {
+        this.sum = sum;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
     public List<ShopUnit> getChildren() {
         return children;
     }
@@ -97,6 +122,16 @@ public class ShopUnit {
 
     @Override
     public String toString() {
-        return "ShopUnit{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", date='" + date + '\'' + ", parentId='" + parentId + '\'' + ", type=" + type + ", price=" + price + ", children=" + children + '}';
+        return "ShopUnit{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", date=" + date +
+                ", parentId='" + parentId + '\'' +
+                ", type=" + type +
+                ", price=" + price +
+                ", sum=" + sum +
+                ", quantity=" + quantity +
+                ", children=" + children +
+                '}';
     }
 }
