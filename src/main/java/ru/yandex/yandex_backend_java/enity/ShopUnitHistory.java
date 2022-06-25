@@ -14,35 +14,35 @@ import java.util.UUID;
 public class ShopUnitHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "revNum")
+    @Column(name = "revNum", columnDefinition = "INT")
     @JsonIgnore
     private int revNum;
 
-    @Column(name = "id")
+    @Column(name = "id", columnDefinition = "VARCHAR(36)")
     private String id = String.valueOf(UUID.randomUUID());
 
-    @Column(name = "name")
+    @Column(name = "name", columnDefinition = "VARCHAR(50)")
     private String name;
 
-    @Column(name = "date")
+    @Column(name = "date", columnDefinition = "DATETIME")
     @JsonFormat(pattern = TimestampUtils.pattern)
     private Date date;
 
-    @Column(name = "parentId")
+    @Column(name = "parentId", columnDefinition = "VARCHAR(36)")
     private String parentId;
 
-    @Column(name = "type")
+    @Column(name = "type", columnDefinition = "VARCHAR(10)")
     @Enumerated(EnumType.STRING)
     private ShopUnitType type;
 
-    @Column(name = "price")
+    @Column(name = "price", columnDefinition = "INT")
     private Integer price;
 
-    @Column(name = "sum")
+    @Column(name = "sum", columnDefinition = "INT")
     @JsonIgnore
     private int sum;
 
-    @Column(name = "quantity")
+    @Column(name = "quantity", columnDefinition = "INT")
     @JsonIgnore
     private int quantity;
 
