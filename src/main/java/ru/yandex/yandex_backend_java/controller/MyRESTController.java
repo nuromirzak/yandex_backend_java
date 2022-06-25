@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.yandex_backend_java.enity.ShopUnit;
+import ru.yandex.yandex_backend_java.enity.ShopUnitHistory;
 import ru.yandex.yandex_backend_java.enity.ShopUnitImportRequest;
 import ru.yandex.yandex_backend_java.enity.ShopUnitType;
 import ru.yandex.yandex_backend_java.exception_handling.NoSuchShopUnitException;
@@ -13,6 +14,8 @@ import ru.yandex.yandex_backend_java.service.ShopUnitService;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -130,7 +133,14 @@ public class MyRESTController {
     }
 
     @GetMapping("/sales")
-    public List<ShopUnit> getHistory(@RequestParam String date) {
-        return null;
+    public List<ShopUnitHistory> getHistory(@RequestParam String date) throws ParseException {
+        Date parsedDate = TimestampUtils.stringToDate(date);
+
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(parsedDate);
+        cal.add(Calendar.DATE, -1);
+        Date dateBefore1Days = cal.getTime();
+        return shopUnitService.getRecordsBetween(dateBefore1Days, parsedDate);
     }
 }

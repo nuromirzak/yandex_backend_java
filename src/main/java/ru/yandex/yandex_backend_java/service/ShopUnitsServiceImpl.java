@@ -8,6 +8,7 @@ import ru.yandex.yandex_backend_java.dao.ShopUnitRepository;
 import ru.yandex.yandex_backend_java.enity.ShopUnit;
 import ru.yandex.yandex_backend_java.enity.ShopUnitHistory;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,5 +68,10 @@ public class ShopUnitsServiceImpl implements ShopUnitService {
     @Transactional
     public void deleteShopUnitHistory(String id) {
         repository2.deleteAllByIdIs(id);
+    }
+
+    @Override
+    public List<ShopUnitHistory> getRecordsBetween(Date date1, Date date2) {
+        return repository2.findAllByDateBetween(date1, date2);
     }
 }
