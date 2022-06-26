@@ -21,7 +21,16 @@
     - mvn clean package
 - Build the Docker image:
     - docker build -t yandex-spring-boot-docker.jar .
-    - docker run -p 8080:8080 yandex-spring-boot-docker.jar
+    - nohup docker run -p 80:80 -d yandex-spring-boot-docker.jar --restart=always
 - Install Java 17 on the server:
     - sudo apt-get install openjdk-17-jre
     - sudo apt-get install openjdk-17-jdk
+- Build the Docker mysql image:
+    - docker build -t mysql-docker .
+    - docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=my_db -e MYSQL_USER=bestuser -e
+      MYSQL_PASSWORD=bestuser mysql-docker
+- Docker auto start:
+    - sudo systemctl enable docker
+    - sudo systemctl enable docker.service
+    - sudo systemctl start docker
+    - docker ps -a
