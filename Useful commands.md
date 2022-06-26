@@ -22,3 +22,6 @@
 - Build the Docker image:
     - docker build -t yandex-spring-boot-docker.jar .
     - docker run -p 8080:8080 yandex-spring-boot-docker.jar
+- Install Java 17 on the server:
+    - sudo apt-get install openjdk-17-jre
+    - sudo apt-get install openjdk-17-jdk
