@@ -34,3 +34,38 @@
     - sudo systemctl enable docker.service
     - sudo systemctl start docker
     - docker ps -a
+- MySQL Image run
+    - docker run --name mysql-standalone --network springmysql-net -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=my_db -e MYSQL_USER=bestuser -e MYSQL_PASSWORD=bestuser -d mysql:5.7
+    - docker logs -f mysql-standalone
+    - docker exec -it <container_id> bash
+    - mysql -u <username> -p
+    - docker run --network springmysql-net --name backend-container -p 80:80 -d yandex-spring-boot-docker.jar
+- Create tables
+- CREATE TABLE `items`
+  (
+  `id`       VARCHAR(36) NOT NULL,
+  `date`     DATETIME DEFAULT NULL,
+  `name`     VARCHAR(45) DEFAULT NULL,
+  `parentid` VARCHAR(36) DEFAULT NULL,
+  `price`    INT DEFAULT NULL,
+  `quantity` INT DEFAULT NULL,
+  `sum`      INT DEFAULT NULL,
+  `type`     VARCHAR(15) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+  )
+  engine=innodb
+  DEFAULT charset=utf8
+- CREATE TABLE `items_history`
+  (
+  `revnum`   INT NOT NULL auto_increment,
+  `id`       VARCHAR(36) DEFAULT NULL,
+  `date`     DATETIME DEFAULT NULL,
+  `parentid` VARCHAR(36) DEFAULT NULL,
+  `price`    INT DEFAULT NULL,
+  `quantity` INT DEFAULT NULL,
+  `sum`      INT DEFAULT NULL,
+  `type`     VARCHAR(15) DEFAULT NULL,
+  PRIMARY KEY (`revnum`)
+  )
+  engine=innodb
+  DEFAULT charset=utf8
